@@ -35,6 +35,14 @@
   ch != none and ch.match(regex("[\p{Hebrew}\p{Arabic}]")) != none
 }
 
+#let _first-cell-body(children) = {
+  for c in children {
+    if c.func() == table.cell {
+      return c.body
+    }
+  }
+  none
+}
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
@@ -44,8 +52,7 @@
 /// a hidden zero-width box that carries the direction into the shaping context.
 /// Usage: some text #r() another word
 ///        some text #l() another word
-#let r() = box(width: 0pt, text(dir: rtl, "\u{200F}"))
-#let l() = box(width: 0pt, text(dir: ltr, "\u{200E}"))
+
 #let r = text(size: 0pt)[י]
 #let l = text(size: 0pt)[i]
 /// Inline direction spans.  Use for mixed-direction fragments:
@@ -65,10 +72,21 @@
 /// Auto-detects direction for par, heading, list, and enum
 /// based on the first strong (Hebrew/Arabic/Latin) character.
 /// RTL blocks get `dir: rtl`; everything else is left as auto.
-#let rtl-auto = body => {
-  show regex("\p{Hebrew}"): set text(font: "David CLM")
+#let rtl-auto = (
+  hebrew-font: "David CLM",
+  arab-font: "Libertinus Serif",
+  english-font: "New Computer Modern",
+  body,
+) => {
+  set text(font: english-font)
+  show regex("\p{Hebrew}"): set text(font: (hebrew-font, "Libertinus Serif"))
+  show regex("\p{Arabic}"): set text(font: (arab-font, "Libertinus Serif"))
 
   show par: it => if _is-rtl(it.body) [
+    #set text(dir: rtl)
+    #it
+  ] else { it }
+  show quote.where(block: true): it => if _is-rtl(it.body) [
     #set text(dir: rtl)
     #it
   ] else { it }
@@ -77,6 +95,7 @@
     #set text(dir: rtl)
     #it
   ] else { it }
+
 
   show list: it => if it.children.len() > 0 and _is-rtl(it.children.at(0).body) [
     #set text(dir: rtl)
@@ -87,6 +106,16 @@
     #set text(dir: rtl)
     #it
   ] else { it }
+
+  show table: it => {
+    let first-cell = _first-cell-body(it.children)
+    if first-cell != none and _is-rtl(first-cell) [
+      #set text(dir: rtl)
+      #it
+    ] else {
+      it
+    }
+  }
 
   body
 }

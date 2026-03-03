@@ -60,9 +60,6 @@
 /// for the rest of the current scope.
 ///   #show: setrl
 ///   #show: setlr
-#let setrl = body => [#set text(dir: rtl); #body]
-#let setlr = body => [#set text(dir: ltr); #body]
-
 /// Document-level show rule.  Apply once at the top of your entry file:
 ///   #show: rtl-auto
 ///
