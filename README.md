@@ -1,4 +1,4 @@
-# rtl-auto
+# bidi-flow
 
 Automatic RTL/LTR direction detection for mixed-direction Typst documents.
 
@@ -7,18 +7,15 @@ Sets `text.dir` per block using the **first strong character** rule — the same
 ## Import
 
 ```typst
-// After installing locally (see below)
-#import "@local/rtl-auto:0.1.0": *
-
-// Or directly from the file
-#import "lib.typ": *
+// Published package import
+#import "@preview/bidi-flow:0.1.0": *
 ```
 
 ## Quick start
 
 ```typst
-#import "@local/rtl-auto:0.1.0": *
-#show: rtl-auto
+#import "@preview/bidi-flow:0.1.0": *
+#show: bidi-flow
 
 = Hello        // → LTR heading
 = שלום         // → RTL heading automatically
@@ -34,20 +31,18 @@ English paragraph here.
 - מוצגת מימין לשמאל
 ```
 
-## Example
+For a longer real-world example, see [`test.typ`](test.typ).
 
-See [example.typ](./example.typ)
-
-![alt text](./assets/image.png)
+![Example output](assets/image.png)
 
 ## API
 
-### `rtl-auto`
+### `bidi-flow`
 
-Document-level show rule. Detects direction for `par`, `heading`, `list`, and `enum` automatically.
+Document-level show rule. Detects direction for `par`, `heading`, `list`, `enum`, and `table` automatically.
 
 ```typst
-#show: rtl-auto
+#show: bidi-flow
 ```
 
 ### `detect-dir(body)`
@@ -90,11 +85,11 @@ Useful for fixing punctuation and number alignment in mixed runs:
 ## Local installation
 
 ```sh
-mkdir -p ~/.local/share/typst/packages/local/rtl-auto/0.1.0
-cp -r . ~/.local/share/typst/packages/local/rtl-auto/0.1.0/
+mkdir -p ~/.local/share/typst/packages/local/bidi-flow/0.1.0
+cp -r . ~/.local/share/typst/packages/local/bidi-flow/0.1.0/
 ```
 
-Then import with `@local/rtl-auto:0.1.0`.
+Then import with `@local/bidi-flow:0.1.0`.
 
 ## Notes
 

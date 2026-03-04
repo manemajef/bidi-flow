@@ -44,6 +44,15 @@
   if ch.match(regex("[\p{Hebrew}\p{Arabic}]")) != none { rtl } else { ltr }
 }
 
+#let _first-cell-body(children) = {
+  for c in children {
+    if c.func() == table.cell {
+      return c.body
+    }
+  }
+  none
+}
+
 /// Invisible zero-width directional seeds.  Insert inline to nudge
 /// the bidi shaping context without adding visible text.
 ///   Usage: price is 100 #r ILS
@@ -60,13 +69,16 @@
 /// for the rest of the current scope.
 ///   #show: setrl
 ///   #show: setlr
-/// Document-level show rule.  Apply once at the top of your entry file:
-///   #show: rtl-auto
+#let setrl = body => [#set text(dir: rtl); #body]
+#let setlr = body => [#set text(dir: ltr); #body]
 ///
-/// Automatically sets `text.dir` for every `par`, `heading`, `list`, and
-/// `enum` based on the first strong (Hebrew/Arabic vs Latin) character.
+/// Document-level show rule.  Apply once at the top of your entry file:
+///   #show: bidi-flow
+///
+/// Automatically sets `text.dir` for every `par`, `heading`, `list`, `enum`,
+/// and `table` based on the first strong (Hebrew/Arabic vs Latin) character.
 /// RTL blocks get `dir: rtl`; everything else keeps Typst's default (`auto`).
-#let rtl-auto = body => {
+#let bidi-flow = body => {
   show par: it => if detect-dir(it.body) == rtl [
     #set text(dir: rtl)
     #it
@@ -86,6 +98,16 @@
     #set text(dir: rtl)
     #it
   ] else { it }
+
+  show table: it => {
+    let first-cell = _first-cell-body(it.children)
+    if first-cell != none and detect-dir(first-cell) == rtl [
+      #set text(dir: rtl)
+      #it
+    ] else {
+      it
+    }
+  }
 
   body
 }
